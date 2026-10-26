@@ -31,7 +31,7 @@ export const ResetConfirmModal: React.FC<Props> = ({ isOpen, onClose }) => {
         </div>
         <h3 className="text-xl font-bold text-gray-900 mb-2">Đặt lại toàn bộ dữ liệu Demo?</h3>
         <p className="text-gray-600 text-sm leading-relaxed mb-6">
-          Hành động này sẽ xóa các đơn hàng mới tạo, các sản phẩm mới thêm, và khôi phục lại danh sách 17 sản phẩm mẫu, 4 tài khoản và 3 đơn hàng chuẩn.
+          Hành động này sẽ xóa các đơn hàng mới tạo, các sản phẩm mới thêm, và khôi phục lại danh sách 30 sản phẩm mẫu đa dạng 12 ngành hàng, 4 tài khoản demo và 3 đơn hàng chuẩn.
         </p>
 
         <div className="flex items-center justify-end gap-3">

@@ -9,6 +9,9 @@ export interface User {
   shopName?: string;
   phone?: string;
   address?: string;
+  passwordHash?: string;
+  passwordSalt?: string;
+  createdAt?: string;
 }
 
 export type ProductStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
@@ -30,12 +33,15 @@ export interface Product {
   rejectReason?: string;
   createdAt: string;
   isFeatured?: boolean;
+  isFlashSale?: boolean;
+  isMall?: boolean;
 }
 
 export interface CartItem {
   productId: string;
   quantity: number;
   sellerId: string;
+  userId: string; // Isolated per user account
 }
 
 export type OrderStatus =

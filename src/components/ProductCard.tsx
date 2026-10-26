@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Star, ShoppingCart, Check } from 'lucide-react';
+import { Star, ShoppingCart } from 'lucide-react';
 import { Product } from '../types';
 import { formatVND, FALLBACK_IMAGE } from '../lib/formatters';
 import { useAppStore } from '../store/useAppStore';
@@ -12,7 +12,6 @@ interface Props {
 
 export const ProductCard: React.FC<Props> = ({ product }) => {
   const [imgSrc, setImgSrc] = useState(product.images[0] || FALLBACK_IMAGE);
-  const [isAdded, setIsAdded] = useState(false);
   const addToCart = useAppStore((state) => state.addToCart);
   const { showToast } = useToast();
 
@@ -26,9 +25,7 @@ export const ProductCard: React.FC<Props> = ({ product }) => {
 
     const result = addToCart(product.id, 1);
     if (result.success) {
-      setIsAdded(true);
-      showToast(`Đã thêm "${product.title.slice(0, 30)}..." vào giỏ!`, 'success');
-      setTimeout(() => setIsAdded(false), 1500);
+      showToast(`Đã thêm vào giỏ: "${product.title.slice(0, 24)}..."`, 'success');
     } else {
       showToast(result.message, 'error');
     }
@@ -37,105 +34,87 @@ export const ProductCard: React.FC<Props> = ({ product }) => {
   const isOutOfStock = product.stock <= 0;
 
   return (
-    <div className="group bg-white rounded-xl border border-gray-100 hover:border-orange-300 hover:shadow-xl transition-all duration-300 flex flex-col overflow-hidden relative">
-      <Link to={`/products/${product.id}`} className="block relative aspect-square overflow-hidden bg-gray-100">
+    <div className="group bg-white rounded-[2px] border border-[#e8e8e8] hover:border-[#ee4d2d] hover:shadow-shopee-hover transition-all duration-200 flex flex-col justify-between overflow-hidden relative font-['Roboto',Arial,sans-serif]">
+      <Link to={`/products/${product.id}`} className="block relative aspect-square overflow-hidden bg-gray-50">
         <img
           src={imgSrc}
           alt={product.title}
           onError={() => setImgSrc(FALLBACK_IMAGE)}
-          className={`w-full h-full object-cover transition-transform duration-500 group-hover:scale-105 ${
+          className={`w-full h-full object-cover transition-transform duration-300 group-hover:scale-105 ${
             isOutOfStock ? 'grayscale opacity-60' : ''
           }`}
           loading="lazy"
         />
 
-        {/* Badges */}
-        <div className="absolute top-2 left-2 flex flex-col gap-1 items-start z-10">
-          <span className="bg-orange-600 text-white font-bold text-[10px] uppercase px-1.5 py-0.5 rounded shadow-sm">
-            Mall
-          </span>
+        {/* Shopee-style badges */}
+        <div className="absolute top-1.5 left-1.5 flex flex-col gap-1 items-start z-10">
+          {product.isMall ? (
+            <span className="bg-[#d0011b] text-white font-bold text-[9px] uppercase px-1 py-0.5 rounded-[2px] leading-none shadow-sm">
+              Mall
+            </span>
+          ) : (
+            <span className="bg-[#ee4d2d] text-white font-medium text-[9px] px-1 py-0.5 rounded-[2px] leading-none shadow-sm">
+              Yêu thích
+            </span>
+          )}
           {isOutOfStock && (
-            <span className="bg-rose-600 text-white font-bold text-[10px] uppercase px-1.5 py-0.5 rounded shadow-sm">
+            <span className="bg-gray-800 text-white font-bold text-[9px] uppercase px-1 py-0.5 rounded-[2px] leading-none">
               Hết hàng
             </span>
           )}
         </div>
 
         {discountPercent > 0 && (
-          <div className="absolute top-0 right-0 bg-amber-400 text-orange-950 font-black text-xs px-2 py-1 rounded-bl-lg shadow-sm flex flex-col items-center leading-none">
-            <span className="text-[11px] text-red-600">GIẢM</span>
-            <span className="text-[13px]">{discountPercent}%</span>
+          <div className="absolute top-0 right-0 bg-[#ffd839]/90 text-[#ee4d2d] font-bold text-[10px] px-1.5 py-0.5 flex flex-col items-center leading-tight">
+            <span>-{discountPercent}%</span>
+            <span className="text-[8px] text-white bg-[#ee4d2d] px-0.5 rounded-[1px] uppercase">Giảm</span>
           </div>
         )}
       </Link>
 
-      <div className="p-3.5 flex-1 flex flex-col justify-between">
+      <div className="p-2.5 flex-1 flex flex-col justify-between">
         <Link to={`/products/${product.id}`}>
-          <h3 className="text-xs sm:text-sm font-semibold text-gray-800 line-clamp-2 group-hover:text-orange-600 transition-colors leading-snug">
+          <h3 className="text-[12px] sm:text-[13px] font-normal text-[#222222] line-clamp-2 leading-snug group-hover:text-[#ee4d2d] transition-colors">
             {product.title}
           </h3>
         </Link>
 
-        <div className="mt-2.5">
+        <div className="mt-2 space-y-1.5">
           {/* Price */}
-          <div className="flex items-baseline gap-2">
-            <span className="text-base sm:text-lg font-bold text-orange-600">
+          <div className="flex items-baseline gap-1.5">
+            <span className="text-[14px] sm:text-[16px] font-bold text-[#ee4d2d]">
               {formatVND(product.price)}
             </span>
             {product.originalPrice && product.originalPrice > product.price && (
-              <span className="text-xs text-gray-400 line-through">
+              <span className="text-[10px] sm:text-[11px] text-[#757575] line-through truncate">
                 {formatVND(product.originalPrice)}
               </span>
             )}
           </div>
 
-          {/* Rating and Sold */}
-          <div className="flex items-center justify-between text-[11px] text-gray-500 mt-1.5">
+          {/* Rating, Sold & Location */}
+          <div className="flex items-center justify-between text-[11px] text-[#757575]">
             <div className="flex items-center gap-1">
-              <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-              <span className="font-semibold text-gray-700">{product.rating.toFixed(1)}</span>
+              <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+              <span className="font-medium text-[#222222] text-[10px]">{product.rating.toFixed(1)}</span>
             </div>
-            <span>Đã bán {product.soldCount > 1000 ? `${(product.soldCount / 1000).toFixed(1)}k` : product.soldCount}</span>
-          </div>
-
-          {/* Seller & stock notice */}
-          <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-100 text-[10px]">
-            <span className="text-gray-500 truncate max-w-[110px]" title={product.sellerName}>
-              {product.sellerName}
+            <span className="text-[10px]">
+              Đã bán {product.soldCount > 1000 ? `${(product.soldCount / 1000).toFixed(1)}k` : product.soldCount}
             </span>
-
-            {product.stock > 0 && product.stock <= 5 ? (
-              <span className="text-rose-600 font-semibold">Chỉ còn {product.stock}</span>
-            ) : (
-              <span className="text-emerald-600 font-medium">Kho: {product.stock}</span>
-            )}
           </div>
 
-          {/* Action button */}
-          <button
-            type="button"
-            disabled={isOutOfStock}
-            onClick={handleQuickAdd}
-            className={`w-full mt-3 py-2 px-3 rounded-lg text-xs font-semibold flex items-center justify-center gap-1.5 transition-all ${
-              isOutOfStock
-                ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                : isAdded
-                ? 'bg-emerald-600 text-white'
-                : 'bg-orange-50 hover:bg-orange-600 text-orange-600 hover:text-white border border-orange-200 hover:border-orange-600'
-            }`}
-          >
-            {isAdded ? (
-              <>
-                <Check className="w-3.5 h-3.5" />
-                <span>Đã thêm!</span>
-              </>
-            ) : (
-              <>
-                <ShoppingCart className="w-3.5 h-3.5" />
-                <span>{isOutOfStock ? 'Tạm hết hàng' : 'Thêm vào giỏ'}</span>
-              </>
-            )}
-          </button>
+          <div className="flex items-center justify-between pt-1 border-t border-gray-100 text-[10px] text-[#757575]">
+            <span className="truncate max-w-[90px]">{product.sellerName}</span>
+            <button
+              type="button"
+              disabled={isOutOfStock}
+              onClick={handleQuickAdd}
+              className="text-[#ee4d2d] hover:bg-orange-50 p-1 rounded transition-colors disabled:opacity-40"
+              title="Thêm nhanh vào giỏ"
+            >
+              <ShoppingCart className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
       </div>
     </div>

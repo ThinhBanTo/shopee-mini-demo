@@ -26,7 +26,9 @@ export const ShipperPortalPage: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<'PICKUP' | 'IN_TRANSIT' | 'DELIVERED'>('PICKUP');
 
-  const isShipperRole = currentUser.role === 'shipper';
+  const isShipperRole = currentUser?.role === 'shipper';
+  const shipperId = currentUser?.id || 'u-shipper-001';
+  const shipperName = currentUser?.name || 'Nguyễn Văn Giao';
 
   const pickupOrders = orders.filter((o) => o.status === 'AWAITING_PICKUP');
   const inTransitOrders = orders.filter((o) => o.status === 'IN_TRANSIT');
@@ -35,7 +37,7 @@ export const ShipperPortalPage: React.FC = () => {
   const totalCodCollected = deliveredOrders.reduce((sum, o) => sum + o.totalAmount, 0);
 
   const handleAcceptPickup = (orderId: string) => {
-    const res = shipperAcceptDelivery(orderId, currentUser.id, currentUser.name);
+    const res = shipperAcceptDelivery(orderId, shipperId, shipperName);
     if (res.success) {
       showToast(res.message, 'success');
       setActiveTab('IN_TRANSIT');
@@ -61,7 +63,7 @@ export const ShipperPortalPage: React.FC = () => {
           <div className="flex items-center gap-2 text-blue-900">
             <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0" />
             <span>
-              Bạn đang xem Cổng Vận Chuyển với vai trò <strong>{currentUser.role}</strong>. Hãy chuyển sang vai trò Shipper để thực hiện nhận đơn và giao hàng.
+              Bạn đang xem Cổng Vận Chuyển với vai trò <strong>{currentUser?.role || 'khách'}</strong>. Hãy chuyển sang vai trò Shipper để thực hiện nhận đơn và giao hàng.
             </span>
           </div>
           <button
@@ -84,7 +86,7 @@ export const ShipperPortalPage: React.FC = () => {
               Cổng Điều Phối Vận Chuyển & Giao Hàng COD
             </h1>
             <p className="text-xs text-gray-500">
-              Tài xế đối tác: <strong>{currentUser.name}</strong> • Khu vực: TP. Hồ Chí Minh
+              Tài xế đối tác: <strong>{currentUser?.name || 'Tài xế Shopee/MiniShoppe'}</strong> • Khu vực: TP. Hồ Chí Minh
             </p>
           </div>
         </div>

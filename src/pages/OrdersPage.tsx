@@ -15,7 +15,23 @@ export const OrdersPage: React.FC = () => {
 
   const [activeTab, setActiveTab] = useState<string>('ALL');
 
-  // Customer orders (in demo, filter by current customer or show all orders placed by customer role)
+  if (!currentUser) {
+    return (
+      <div className="max-w-md mx-auto px-4 py-16 text-center space-y-4">
+        <Package className="w-16 h-16 text-gray-300 mx-auto" />
+        <h2 className="text-lg font-bold text-gray-800">Vui lòng đăng nhập</h2>
+        <p className="text-xs text-gray-500">Đăng nhập tài khoản để theo dõi lịch sử mua hàng và vận chuyển đơn hàng của bạn.</p>
+        <Link
+          to="/login"
+          className="inline-block px-6 py-2.5 bg-[#ee4d2d] text-white font-medium text-sm rounded shadow-sm hover:bg-[#d73211] transition-colors"
+        >
+          Đăng nhập ngay
+        </Link>
+      </div>
+    );
+  }
+
+  // Customer orders (filter by current customer or show all if admin/seller)
   const myOrders = orders.filter((o) => o.customerId === currentUser.id || currentUser.role !== 'customer');
 
   const filteredOrders = myOrders.filter((order) => {

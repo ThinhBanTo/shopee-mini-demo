@@ -9,7 +9,7 @@ export const NotFoundPage: React.FC = () => {
         <span className="text-6xl font-black text-orange-600">404</span>
         <h2 className="text-xl font-bold text-gray-900 mt-2 mb-2">Trang không tồn tại</h2>
         <p className="text-xs text-gray-500 mb-6 leading-relaxed">
-          Đường dẫn bạn yêu cầu không tồn tại hoặc đã được di chuyển trong hệ thống MiniMall.
+          Đường dẫn bạn yêu cầu không tồn tại hoặc đã được di chuyển trong hệ thống MiniShoppe.
         </p>
 
         <div className="flex items-center justify-center gap-3">

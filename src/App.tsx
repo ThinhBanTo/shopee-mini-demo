@@ -7,8 +7,9 @@ import { HomePage } from './pages/HomePage';
 import { ProductDetailPage } from './pages/ProductDetailPage';
 import { DemoGuidePage } from './pages/DemoGuidePage';
 import { NotFoundPage } from './pages/NotFoundPage';
+import { LoginPage } from './pages/LoginPage';
+import { RegisterPage } from './pages/RegisterPage';
 
-// Stub/Pages for Phase 2 & 3 - we will expand them in respective phases
 import { CartPage } from './pages/CartPage';
 import { CheckoutPage } from './pages/CheckoutPage';
 import { OrdersPage } from './pages/OrdersPage';
@@ -22,6 +23,11 @@ const App: React.FC = () => {
     <BrowserRouter>
       <ToastProvider>
         <Routes>
+          {/* Auth standalone routes */}
+          <Route path="login" element={<LoginPage />} />
+          <Route path="register" element={<RegisterPage />} />
+
+          {/* Main Marketplace Layout routes */}
           <Route path="/" element={<MainLayout />}>
             <Route index element={<HomePage />} />
             <Route path="products/:id" element={<ProductDetailPage />} />
@@ -32,7 +38,7 @@ const App: React.FC = () => {
 
             {/* Seller routes */}
             <Route path="seller" element={<SellerDashboardPage />} />
-            <Route path="seller/products" element={<SellerDashboardPage />} />
+            <Route path="seller/products" element={<SellerDashboardPage defaultTab="products" />} />
             <Route path="seller/products/new" element={<SellerDashboardPage defaultTab="new-product" />} />
             <Route path="seller/orders" element={<SellerDashboardPage defaultTab="orders" />} />
 

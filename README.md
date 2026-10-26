@@ -1,91 +1,43 @@
-# MiniMall — Demo Sàn Thương Mại Điện Tử (4 Vai Trò)
+# MiniShoppe — Sàn Thương Mại Điện Tử Mô Phỏng (Interactive Prototype)
 
-> **Tuyên bố từ chối trách nhiệm:** Đây là dự án tương tác mô phỏng sàn thương mại điện tử phục vụ mục đích học tập và báo cáo đồ án, không liên kết với Shopee. Không sử dụng logo/tài sản có bản quyền của Shopee. Dữ liệu được lưu trữ trực tiếp trong trình duyệt qua `localStorage` (không dùng backend, database thật, OAuth hay cổng thanh toán trực tuyến thật).
+> **Lưu ý:** Đây là đồ án mô phỏng phong cách sàn thương mại điện tử phục vụ học tập và báo cáo, không liên kết với Shopee. Ứng dụng hoạt động hoàn toàn ở client, không dùng backend thật hay cổng thanh toán thật.
 
----
+## 1. Giới thiệu
+MiniShoppe là ứng dụng thương mại điện tử mô phỏng đầy đủ chu trình mua bán hàng COD với 4 vai trò (Customer, Seller, Admin, Shipper), tích hợp hệ thống Mock Authentication (Đăng ký / Đăng nhập sử dụng Web Crypto PBKDF2) và giao diện phong cách marketplace Việt Nam hiện đại.
 
-## 1. Công nghệ sử dụng
-- **Core:** React 18 + TypeScript + Vite 6
-- **Styling:** Tailwind CSS (Tone màu cam/trắng phong cách sàn TMĐT hiện đại, responsive mobile và desktop)
-- **Routing:** React Router v6 (BrowserRouter kết hợp cấu hình `vercel.json` SPA rewrite)
-- **State Management & Persistence:** Zustand kết hợp `persist` middleware đồng bộ tức thời vào `localStorage`, có schema versioning và chức năng Khôi phục dữ liệu mẫu ban đầu (Reset Seed Data).
+## 2. Công nghệ sử dụng
+- **Core:** React 18, TypeScript, Vite
+- **Styling:** Tailwind CSS (Roboto font, tông màu `#EE4D2D`, Shopee marketplace UI)
+- **Routing:** React Router v6 (BrowserRouter + cấu hình SPA rewrite)
+- **State & Storage:** Zustand persist (`localStorage` schema v2, dữ liệu giỏ hàng và đơn mua phân lập theo từng tài khoản)
+- **Security Mock:** Web Crypto API (PBKDF2 SHA-256 derivation)
 - **Icons:** `lucide-react`
-- **Định dạng tiền tệ:** Chuẩn `vi-VN` (VND)
 
----
-
-## 2. Các vai trò trong hệ thống (Demo Role Switcher)
-Hệ thống tích hợp thanh chuyển đổi vai trò trực quan trên Header:
-1. **Khách hàng (`customer`):** Nguyễn Văn An (`khachhang@demo.vn`)
-   - Xem danh sách sản phẩm đã được Admin phê duyệt (`APPROVED`), lọc danh mục, tìm kiếm, sắp xếp theo giá/độ phổ biến.
-   - Xem chi tiết sản phẩm, chọn số lượng, thêm vào giỏ hàng hoặc bấm "Mua Ngay (COD)".
-   - Áp dụng mã giảm giá (`DEMO10`, `FREESHIP`).
-   - Đặt hàng thanh toán khi nhận hàng (COD).
-   - Quản lý "Đơn mua", theo dõi dòng thời gian (Timeline) giao hàng trực tiếp.
-2. **Người bán (`seller`):** Trần Thị Mai — Mai Store Chính Hãng (`nguoiban@demo.vn`)
-   - Bảng điều khiển tổng quan gian hàng, doanh thu và các chỉ số vận hành.
-   - Đăng bán sản phẩm mới: Tên, giá, tồn kho, ảnh, danh mục. Trạng thái khởi tạo luôn là `PENDING` (Chờ duyệt).
-   - Quản lý danh sách sản phẩm: Xem trạng thái `PENDING`, `APPROVED`, `REJECTED`.
-   - Xử lý đơn hàng: Tiếp nhận đơn `PENDING_CONFIRMATION` ➔ Chuyển sang `PREPARING` (Đang đóng gói) ➔ `AWAITING_PICKUP` (Sẵn sàng bàn giao cho Shipper).
-3. **Quản trị viên (`admin`):** Lê Hoàng Quân (`admin@demo.vn`)
-   - Kiểm duyệt các sản phẩm mới đăng của người bán.
-   - Phê duyệt (`APPROVED`) để mở bán công khai cho khách hàng.
-   - Từ chối (`REJECTED`) kèm lý do giải thích cụ thể cho người bán.
-4. **Shipper (`shipper`):** Phạm Tuấn Anh (`shipper@demo.vn`)
-   - Xem danh sách các đơn hàng đã được shop đóng gói (`AWAITING_PICKUP`).
-   - Nhận đơn và bắt đầu giao (`IN_TRANSIT`).
-   - Xác nhận giao hàng thành công và thu tiền mặt COD (`DELIVERED`).
-
----
-
-## 3. Kịch bản kiểm thử 6 bước (P0 End-to-End Flow)
-Truy cập route `/demo-guide` để xem hướng dẫn trực quan ngay trên giao diện web:
-1. **Bước 1 (Seller):** Chuyển vai trò sang `Người bán` ➔ Vào Kênh Người Bán ➔ Đăng sản phẩm mới (ví dụ: *"Tai nghe Demo 2026"*, giá 350.000₫, kho 20) ➔ Trạng thái hiển thị là `Chờ duyệt (PENDING)`.
-2. **Bước 2 (Customer):** Chuyển vai trò sang `Khách hàng` ➔ Tìm kiếm sản phẩm *"Tai nghe Demo 2026"* ➔ Xác nhận sản phẩm **chưa được hiển thị** cho khách hàng.
-3. **Bước 3 (Admin):** Chuyển vai trò sang `Quản trị viên` ➔ Vào mục Duyệt sản phẩm ➔ Bấm **"Phê duyệt"** sản phẩm *"Tai nghe Demo 2026"*.
-4. **Bước 4 (Customer):** Chuyển lại `Khách hàng` ➔ Tìm kiếm lại thấy sản phẩm đã mở bán ➔ Bấm vào chi tiết ➔ Thêm giỏ hàng ➔ Nhập mã giảm giá **`DEMO10`** (giảm 10%) ➔ Điền thông tin giao nhận ➔ Xác nhận đặt hàng **COD**.
-5. **Bước 5 (Seller):** Chuyển sang `Người bán` ➔ Mở mục Đơn hàng của shop ➔ Thấy đơn mới trạng thái *Chờ xác nhận* ➔ Bấm **"Xác nhận & Chuẩn bị hàng"** ➔ Bấm **"Đã đóng gói xong - Chờ Shipper"**.
-6. **Bước 6 (Shipper & Khách):** Chuyển sang `Shipper` ➔ Bấm **"Nhận Đơn & Bắt Đầu Giao"** ➔ Bấm **"Xác Nhận Đã Giao & Thu Tiền COD"** ➔ Chuyển lại `Khách hàng` vào mục *Đơn mua* xem dòng thời gian (Timeline) cập nhật trạng thái *Giao hàng thành công*.
-
----
-
-## 4. Hướng dẫn chạy tại Local
+## 3. Cách chạy dự án tại Local
 ```bash
-# 1. Cài đặt các thư viện
+# 1. Cài đặt dependencies
 npm install
 
-# 2. Khởi chạy máy chủ phát triển (Development)
+# 2. Khởi chạy môi trường phát triển
 npm run dev
 
-# Mở trình duyệt tại: http://localhost:5173/
+# Mở trình duyệt tại: http://localhost:5173
 
-# 3. Kiểm tra TypeScript & Build sản phẩm
+# 3. Build kiểm tra production
 npm run build
-
-# 4. Chạy thử bản production preview
-npm run preview
 ```
 
----
+## 4. Tài khoản Demo & 4 Vai trò (Mật khẩu: `demo12345`)
+- **Khách hàng (`customer`):** `khachhang@demo.vn` — Mua hàng COD, giỏ hàng riêng, theo dõi tiến trình đơn.
+- **Người bán (`seller`):** `nguoiban@demo.vn` — Đăng sản phẩm mới (chờ duyệt), xác nhận đơn hàng, đóng gói.
+- **Quản trị viên (`admin`):** `admin@demo.vn` — Kiểm duyệt phê duyệt / từ chối sản phẩm của Người bán.
+- **Shipper (`shipper`):** `shipper@demo.vn` — Tiếp nhận đơn vận chuyển và xác nhận giao hàng thành công.
+- *Có thể tự đăng ký tài khoản Khách hàng mới tại `/register` hoặc sử dụng Demo Mode dropdown trên Header.*
 
-## 5. Hướng dẫn Deploy lên Vercel
-1. Đẩy mã nguồn lên kho lưu trữ GitHub của bạn.
-2. Đăng nhập vào [Vercel](https://vercel.com/) và bấm **"Add New Project"** ➔ Chọn repository `shopee-mini-demo`.
-3. Cấu hình triển khai:
-   - **Framework Preset:** Vite
-   - **Root Directory:** `./`
-   - **Build Command:** `npm run build`
-   - **Output Directory:** `dist`
-4. File `vercel.json` đã có sẵn cấu hình rewrite SPA:
-```json
-{
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ]
-}
-```
-5. Bấm **Deploy**. Tất cả các direct URL như `/orders`, `/seller`, `/admin`, `/demo-guide` đều load mượt mà không gặp lỗi 404.
+## 5. Giới hạn Mock Auth & Dữ liệu
+- Toàn bộ dữ liệu (tài khoản, mật khẩu băm PBKDF2, giỏ hàng, đơn hàng, sản phẩm) lưu trong `localStorage`.
+- Đổi trình duyệt hoặc bấm nút "Khôi phục dữ liệu mẫu ban đầu" sẽ khôi phục lại bộ 30 sản phẩm và 4 tài khoản mặc định.
+
+## 6. Triển khai Vercel
+- Cấu hình SPA rewrite đã có trong file `vercel.json`.
+- Output directory khi deploy: `dist`.

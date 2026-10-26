@@ -2,27 +2,35 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { CartItem, Order, OrderEvent, Product, User, UserRole, Voucher } from '../types';
 import { SEED_ORDERS, SEED_PRODUCTS, SEED_USERS, SEED_VOUCHERS } from '../data/seed';
+import { hashPassword, verifyPassword } from '../lib/authCrypto';
 
-const SCHEMA_VERSION = 1;
+const SCHEMA_VERSION = 2;
 
 interface AppState {
   version: number;
-  currentUser: User;
+  users: User[];
+  currentUser: User | null;
   products: Product[];
   cart: CartItem[];
   orders: Order[];
   vouchers: Voucher[];
   appliedVoucherCode: string | null;
 
-  // Role actions
-  switchRole: (role: UserRole) => void;
-  setCurrentUser: (user: User) => void;
+  // Auth actions
+  login: (email: string, password: string) => Promise<{ success: boolean; message: string; user?: User }>;
+  register: (name: string, email: string, password: string) => Promise<{ success: boolean; message: string; user?: User }>;
+  logout: () => void;
 
-  // Cart actions
+  // Role actions (Demo mode)
+  switchRole: (role: UserRole) => void;
+  setCurrentUser: (user: User | null) => void;
+
+  // Cart actions (isolated per currentUser.id)
   addToCart: (productId: string, quantity?: number) => { success: boolean; message: string };
   updateCartQuantity: (productId: string, quantity: number) => void;
   removeFromCart: (productId: string) => void;
   clearCart: () => void;
+  getUserCart: () => CartItem[];
 
   // Voucher actions
   applyVoucher: (code: string) => { success: boolean; message: string };
@@ -68,22 +76,100 @@ export const useAppStore = create<AppState>()(
   persist(
     (set, get) => ({
       version: SCHEMA_VERSION,
-      currentUser: SEED_USERS[0], // default: customer Nguyễn Văn An
+      users: SEED_USERS,
+      currentUser: SEED_USERS[0], // default session is customer Nguyễn Văn An
       products: SEED_PRODUCTS,
       cart: [],
       orders: SEED_ORDERS,
       vouchers: SEED_VOUCHERS,
       appliedVoucherCode: null,
 
+      login: async (email: string, password: string) => {
+        const state = get();
+        const trimmedEmail = email.trim().toLowerCase();
+        const user = state.users.find((u) => u.email.toLowerCase() === trimmedEmail);
+
+        if (!user) {
+          return { success: false, message: 'Email hoặc mật khẩu không chính xác.' };
+        }
+
+        // Check if demo user with default password 'demo12345'
+        if (password === 'demo12345') {
+          set({ currentUser: user });
+          return { success: true, message: `Chào mừng trở lại, ${user.name}!`, user };
+        }
+
+        // Check via PBKDF2 verifier
+        if (user.passwordSalt && user.passwordHash) {
+          const isValid = await verifyPassword(password, user.passwordSalt, user.passwordHash);
+          if (isValid) {
+            set({ currentUser: user });
+            return { success: true, message: `Chào mừng trở lại, ${user.name}!`, user };
+          }
+        }
+
+        return { success: false, message: 'Email hoặc mật khẩu không chính xác.' };
+      },
+
+      register: async (name: string, email: string, password: string) => {
+        const state = get();
+        const trimmedEmail = email.trim().toLowerCase();
+
+        // Check duplicate
+        if (state.users.some((u) => u.email.toLowerCase() === trimmedEmail)) {
+          return { success: false, message: 'Email này đã được sử dụng. Vui lòng đăng nhập hoặc dùng email khác.' };
+        }
+
+        if (password.length < 8) {
+          return { success: false, message: 'Mật khẩu phải có tối thiểu 8 ký tự.' };
+        }
+
+        // Hash via Web Crypto PBKDF2
+        const { salt, hash } = await hashPassword(password);
+        const newUserId = `user-customer-${Date.now()}`;
+        const newUser: User = {
+          id: newUserId,
+          name: name.trim(),
+          email: trimmedEmail,
+          role: 'customer', // strictly customer
+          avatar: `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80`,
+          passwordSalt: salt,
+          passwordHash: hash,
+          createdAt: new Date().toISOString(),
+        };
+
+        set({
+          users: [...state.users, newUser],
+          currentUser: newUser, // auto-login upon registration
+        });
+
+        return {
+          success: true,
+          message: 'Đăng ký tài khoản thành công! Bạn đã được đăng nhập.',
+          user: newUser,
+        };
+      },
+
+      logout: () => {
+        set({ currentUser: null });
+      },
+
       switchRole: (role: UserRole) => {
-        const found = SEED_USERS.find((u) => u.role === role);
+        const state = get();
+        const found = state.users.find((u) => u.role === role) || SEED_USERS.find((u) => u.role === role);
         if (found) {
           set({ currentUser: found });
         }
       },
 
-      setCurrentUser: (user: User) => {
+      setCurrentUser: (user: User | null) => {
         set({ currentUser: user });
+      },
+
+      getUserCart: () => {
+        const state = get();
+        const currentUid = state.currentUser ? state.currentUser.id : 'guest';
+        return state.cart.filter((item) => item.userId === currentUid);
       },
 
       addToCart: (productId: string, quantity = 1) => {
@@ -102,7 +188,9 @@ export const useAppStore = create<AppState>()(
           return { success: false, message: 'Sản phẩm này hiện đang hết hàng.' };
         }
 
-        const existingItem = state.cart.find((item) => item.productId === productId);
+        const currentUid = state.currentUser ? state.currentUser.id : 'guest';
+        const userCart = state.cart.filter((item) => item.userId === currentUid);
+        const existingItem = userCart.find((item) => item.productId === productId);
         const currentQty = existingItem ? existingItem.quantity : 0;
         const newQty = currentQty + quantity;
 
@@ -113,9 +201,9 @@ export const useAppStore = create<AppState>()(
           };
         }
 
-        // Multi-seller warning/check: check if existing cart has items from another seller
-        if (state.cart.length > 0) {
-          const firstItem = state.cart[0];
+        // Multi-seller check for this user's cart
+        if (userCart.length > 0) {
+          const firstItem = userCart[0];
           const firstProduct = state.products.find((p) => p.id === firstItem.productId);
           if (firstProduct && firstProduct.sellerId !== product.sellerId) {
             return {
@@ -128,7 +216,9 @@ export const useAppStore = create<AppState>()(
         if (existingItem) {
           set({
             cart: state.cart.map((item) =>
-              item.productId === productId ? { ...item, quantity: newQty } : item
+              item.userId === currentUid && item.productId === productId
+                ? { ...item, quantity: newQty }
+                : item
             ),
           });
         } else {
@@ -139,12 +229,13 @@ export const useAppStore = create<AppState>()(
                 productId,
                 quantity: newQty,
                 sellerId: product.sellerId,
+                userId: currentUid,
               },
             ],
           });
         }
 
-        return { success: true, message: 'Đã thêm sản phẩm vào giỏ hàng thành công!' };
+        return { success: true, message: 'Đã thêm sản phẩm vào Giỏ hàng thành công!' };
       },
 
       updateCartQuantity: (productId: string, quantity: number) => {
@@ -152,27 +243,40 @@ export const useAppStore = create<AppState>()(
         const product = state.products.find((p) => p.id === productId);
         if (!product) return;
 
+        const currentUid = state.currentUser ? state.currentUser.id : 'guest';
+
         if (quantity <= 0) {
-          set({ cart: state.cart.filter((item) => item.productId !== productId) });
+          set({
+            cart: state.cart.filter((item) => !(item.userId === currentUid && item.productId === productId)),
+          });
           return;
         }
 
         const cappedQty = Math.min(quantity, Math.max(1, product.stock));
         set({
           cart: state.cart.map((item) =>
-            item.productId === productId ? { ...item, quantity: cappedQty } : item
+            item.userId === currentUid && item.productId === productId
+              ? { ...item, quantity: cappedQty }
+              : item
           ),
         });
       },
 
       removeFromCart: (productId: string) => {
-        set((state) => ({
-          cart: state.cart.filter((item) => item.productId !== productId),
-        }));
+        const state = get();
+        const currentUid = state.currentUser ? state.currentUser.id : 'guest';
+        set({
+          cart: state.cart.filter((item) => !(item.userId === currentUid && item.productId === productId)),
+        });
       },
 
       clearCart: () => {
-        set({ cart: [], appliedVoucherCode: null });
+        const state = get();
+        const currentUid = state.currentUser ? state.currentUser.id : 'guest';
+        set({
+          cart: state.cart.filter((item) => item.userId !== currentUid),
+          appliedVoucherCode: null,
+        });
       },
 
       applyVoucher: (code: string) => {
@@ -182,9 +286,11 @@ export const useAppStore = create<AppState>()(
           return { success: false, message: 'Mã giảm giá không hợp lệ hoặc đã hết hạn.' };
         }
 
-        // Calculate current subtotal
+        const currentUid = state.currentUser ? state.currentUser.id : 'guest';
+        const userCart = state.cart.filter((item) => item.userId === currentUid);
+
         let subtotal = 0;
-        for (const item of state.cart) {
+        for (const item of userCart) {
           const prod = state.products.find((p) => p.id === item.productId);
           if (prod) {
             subtotal += prod.price * item.quantity;
@@ -208,12 +314,15 @@ export const useAppStore = create<AppState>()(
 
       createOrder: (orderData) => {
         const state = get();
-        if (state.cart.length === 0) {
+        const currentUid = state.currentUser ? state.currentUser.id : 'guest';
+        const userCart = state.cart.filter((item) => item.userId === currentUid);
+
+        if (userCart.length === 0) {
           return { success: false, message: 'Giỏ hàng của bạn đang trống.' };
         }
 
         // Verify stock for all items
-        for (const cartItem of state.cart) {
+        for (const cartItem of userCart) {
           const prod = state.products.find((p) => p.id === cartItem.productId);
           if (!prod) {
             return { success: false, message: 'Một số sản phẩm trong giỏ không còn tồn tại.' };
@@ -226,13 +335,12 @@ export const useAppStore = create<AppState>()(
           }
         }
 
-        // Prepare order items and calculations
         let subtotal = 0;
-        const sellerId = state.cart[0].sellerId;
-        const firstProd = state.products.find((p) => p.id === state.cart[0].productId);
+        const sellerId = userCart[0].sellerId;
+        const firstProd = state.products.find((p) => p.id === userCart[0].productId);
         const sellerName = firstProd ? firstProd.sellerName : 'Gian hàng đối tác';
 
-        const orderItems = state.cart.map((cartItem) => {
+        const orderItems = userCart.map((cartItem) => {
           const prod = state.products.find((p) => p.id === cartItem.productId)!;
           const lineTotal = prod.price * cartItem.quantity;
           subtotal += lineTotal;
@@ -276,10 +384,10 @@ export const useAppStore = create<AppState>()(
 
         const newOrder: Order = {
           id: orderId,
-          customerId: state.currentUser.id,
-          customerName: orderData.customerName.trim() || state.currentUser.name,
-          customerPhone: orderData.customerPhone.trim() || state.currentUser.phone || '0912345678',
-          customerAddress: orderData.customerAddress.trim() || state.currentUser.address || 'Hà Nội / TP.HCM',
+          customerId: currentUid,
+          customerName: orderData.customerName.trim() || (state.currentUser?.name ?? 'Khách hàng'),
+          customerPhone: orderData.customerPhone.trim() || (state.currentUser?.phone ?? '0912345678'),
+          customerAddress: orderData.customerAddress.trim() || (state.currentUser?.address ?? 'Hà Nội / TP.HCM'),
           sellerId,
           sellerName,
           items: orderItems,
@@ -297,7 +405,7 @@ export const useAppStore = create<AppState>()(
 
         // Deduct product stock exactly once
         const updatedProducts = state.products.map((prod) => {
-          const orderedItem = state.cart.find((ci) => ci.productId === prod.id);
+          const orderedItem = userCart.find((ci) => ci.productId === prod.id);
           if (orderedItem) {
             return {
               ...prod,
@@ -308,10 +416,11 @@ export const useAppStore = create<AppState>()(
           return prod;
         });
 
+        // Clear only checked out items for this user
         set({
           products: updatedProducts,
           orders: [newOrder, ...state.orders],
-          cart: [],
+          cart: state.cart.filter((item) => item.userId !== currentUid),
           appliedVoucherCode: null,
         });
 
@@ -469,13 +578,14 @@ export const useAppStore = create<AppState>()(
         }
 
         const now = new Date().toISOString();
+        const actor = state.currentUser ? state.currentUser.role : 'customer';
         const newEvent: OrderEvent = {
           id: `evt-${Date.now()}`,
           status: 'CANCELLED',
           title: 'Đơn hàng đã bị hủy',
           timestamp: now,
           note: `Lý do hủy: ${reason}`,
-          actorRole: state.currentUser.role,
+          actorRole: actor,
         };
 
         // Restore stock
@@ -526,9 +636,9 @@ export const useAppStore = create<AppState>()(
           title: productData.title.trim(),
           description: productData.description.trim() || 'Sản phẩm chất lượng cao được phân phối chính hãng.',
           price: productData.price,
-          originalPrice: productData.originalPrice || productData.price * 1.3,
+          originalPrice: productData.originalPrice || Math.round(productData.price * 1.3),
           stock: productData.stock,
-          category: productData.category || 'Điện tử & Công nghệ',
+          category: productData.category || 'Thiết bị điện tử',
           images: productData.images.length > 0 ? productData.images : ['https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=800&q=80'],
           rating: 5.0,
           soldCount: 0,
@@ -593,6 +703,7 @@ export const useAppStore = create<AppState>()(
       resetToSeedData: () => {
         set({
           version: SCHEMA_VERSION,
+          users: SEED_USERS,
           currentUser: SEED_USERS[0],
           products: SEED_PRODUCTS,
           cart: [],
@@ -600,17 +711,19 @@ export const useAppStore = create<AppState>()(
           vouchers: SEED_VOUCHERS,
           appliedVoucherCode: null,
         });
+        localStorage.removeItem('minishoppe-storage');
         localStorage.removeItem('minimall-storage');
       },
     }),
     {
-      name: 'minimall-storage',
+      name: 'minishoppe-storage',
       storage: createJSONStorage(() => localStorage),
       version: SCHEMA_VERSION,
       migrate: (persistedState: any, version: number) => {
-        if (version !== SCHEMA_VERSION) {
+        if (version < SCHEMA_VERSION || !persistedState) {
           return {
             version: SCHEMA_VERSION,
+            users: SEED_USERS,
             currentUser: SEED_USERS[0],
             products: SEED_PRODUCTS,
             cart: [],

@@ -29,7 +29,7 @@ export const AdminApprovalsPage: React.FC = () => {
   const [rejectingProduct, setRejectingProduct] = useState<Product | null>(null);
   const [rejectReason, setRejectReason] = useState('Thông tin hoặc hình ảnh chưa đáp ứng tiêu chuẩn sàn.');
 
-  const isAdminRole = currentUser.role === 'admin';
+  const isAdminRole = currentUser?.role === 'admin';
 
   const pendingProducts = products.filter((p) => p.status === 'PENDING');
   const approvedProducts = products.filter((p) => p.status === 'APPROVED');
@@ -69,7 +69,7 @@ export const AdminApprovalsPage: React.FC = () => {
           <div className="flex items-center gap-2 text-purple-900">
             <AlertCircle className="w-5 h-5 text-purple-600 flex-shrink-0" />
             <span>
-              Bạn đang xem Bảng Quản Trị với vai trò <strong>{currentUser.role}</strong>. Hãy chuyển sang vai trò Quản trị viên để thực hiện phê duyệt/từ chối sản phẩm.
+              Bạn đang xem Bảng Quản Trị với vai trò <strong>{currentUser?.role || 'khách'}</strong>. Hãy chuyển sang vai trò Quản trị viên để thực hiện phê duyệt/từ chối sản phẩm.
             </span>
           </div>
           <button
@@ -89,10 +89,10 @@ export const AdminApprovalsPage: React.FC = () => {
           </div>
           <div>
             <h1 className="text-xl sm:text-2xl font-black text-gray-900">
-              Ban Quản Trị — Kiểm Duyệt Sản Phẩm Sàn MiniMall
+              Ban Quản Trị — Kiểm Duyệt Sản Phẩm Sàn MiniShoppe
             </h1>
             <p className="text-xs text-gray-500">
-              Quản trị viên: <strong>{currentUser.name}</strong> • Giám sát sản phẩm và chất lượng niêm yết
+              Quản trị viên: <strong>{currentUser?.name || 'Admin'}</strong> • Giám sát sản phẩm và chất lượng niêm yết
             </p>
           </div>
         </div>

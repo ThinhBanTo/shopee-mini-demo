@@ -106,7 +106,7 @@ export const DemoGuidePage: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {SEED_USERS.map((user) => {
-            const isCurrent = currentUser.role === user.role;
+            const isCurrent = currentUser?.role === user.role;
             return (
               <div
                 key={user.id}

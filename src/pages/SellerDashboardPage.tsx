@@ -47,11 +47,13 @@ export const SellerDashboardPage: React.FC<Props> = ({ defaultTab = 'overview' }
   const [isCreating, setIsCreating] = useState(false);
 
   // Auto switch to seller if not already seller or allow test
-  const isSellerRole = currentUser.role === 'seller';
+  const isSellerRole = currentUser?.role === 'seller';
+  const sellerId = currentUser?.id || 'u-seller-001';
+  const sellerName = currentUser?.shopName || currentUser?.name || 'Shop Người Bán';
 
   // Seller's own items
-  const myProducts = products.filter((p) => p.sellerId === currentUser.id || currentUser.role === 'seller');
-  const myOrders = orders.filter((o) => o.sellerId === currentUser.id || currentUser.role === 'seller');
+  const myProducts = products.filter((p) => p.sellerId === sellerId || currentUser?.role === 'seller');
+  const myOrders = orders.filter((o) => o.sellerId === sellerId || currentUser?.role === 'seller');
 
   const pendingApprovalProducts = myProducts.filter((p) => p.status === 'PENDING');
   const approvedProducts = myProducts.filter((p) => p.status === 'APPROVED');
@@ -80,14 +82,14 @@ export const SellerDashboardPage: React.FC<Props> = ({ defaultTab = 'overview' }
     setIsCreating(true);
     const result = createProduct({
       title: newTitle.trim(),
-      description: newDescription.trim() || 'Sản phẩm mới chính hãng từ ' + (currentUser.shopName || 'Shop Người Bán'),
+      description: newDescription.trim() || 'Sản phẩm mới chính hãng từ ' + sellerName,
       price: newPrice,
       originalPrice: newOriginalPrice > newPrice ? newOriginalPrice : undefined,
       stock: newStock,
       category: newCategory,
       images: newImageUrl.trim() ? [newImageUrl.trim()] : ['https://images.unsplash.com/photo-1545454675-3531b543be5d?auto=format&fit=crop&w=800&q=80'],
-      sellerId: currentUser.id,
-      sellerName: currentUser.shopName || currentUser.name,
+      sellerId,
+      sellerName,
     });
 
     setIsCreating(false);
@@ -131,7 +133,7 @@ export const SellerDashboardPage: React.FC<Props> = ({ defaultTab = 'overview' }
           <div className="flex items-center gap-2 text-amber-900">
             <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0" />
             <span>
-              Bạn đang xem Kênh Người Bán với tài khoản <strong>{currentUser.name}</strong> ({currentUser.role}). Hãy chuyển sang vai trò Người bán để thao tác đầy đủ.
+              Bạn đang xem Kênh Người Bán với tài khoản <strong>{currentUser?.name || 'Khách'}</strong> ({currentUser?.role || 'Chưa đăng nhập'}). Hãy chuyển sang vai trò Người bán để thao tác đầy đủ.
             </span>
           </div>
           <button
@@ -154,7 +156,7 @@ export const SellerDashboardPage: React.FC<Props> = ({ defaultTab = 'overview' }
               Kênh Quản Lý Người Bán
             </h1>
             <p className="text-xs text-gray-500">
-              Gian hàng: <strong>{currentUser.shopName || 'Mai Store Chính Hãng'}</strong> • Mã người bán: {currentUser.id}
+              Gian hàng: <strong>{currentUser?.shopName || 'Mai Store Chính Hãng'}</strong> • Mã người bán: {currentUser?.id || 'u-seller-001'}
             </p>
           </div>
         </div>

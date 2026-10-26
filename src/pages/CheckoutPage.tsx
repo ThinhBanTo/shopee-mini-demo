@@ -18,17 +18,19 @@ export const CheckoutPage: React.FC = () => {
   const { showToast } = useToast();
 
   const currentUser = useAppStore((state) => state.currentUser);
-  const cart = useAppStore((state) => state.cart);
+  const getUserCart = useAppStore((state) => state.getUserCart);
   const products = useAppStore((state) => state.products);
   const vouchers = useAppStore((state) => state.vouchers);
   const appliedVoucherCode = useAppStore((state) => state.appliedVoucherCode);
   const createOrder = useAppStore((state) => state.createOrder);
 
-  // Form state initialized with demo user info
-  const [recipientName, setRecipientName] = useState(currentUser.name || 'Nguyễn Văn An');
-  const [recipientPhone, setRecipientPhone] = useState(currentUser.phone || '0912345678');
+  const cart = getUserCart();
+
+  // Form state
+  const [recipientName, setRecipientName] = useState(currentUser?.name || 'Nguyễn Văn An');
+  const [recipientPhone, setRecipientPhone] = useState(currentUser?.phone || '0912345678');
   const [recipientAddress, setRecipientAddress] = useState(
-    currentUser.address || 'Số 45, Đường Lê Duẩn, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh'
+    currentUser?.address || 'Số 45, Đường Lê Duẩn, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh'
   );
   const [note, setNote] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -69,17 +71,17 @@ export const CheckoutPage: React.FC = () => {
 
   if (cart.length === 0) {
     return (
-      <div className="max-w-2xl mx-auto px-4 py-16 text-center">
-        <div className="w-16 h-16 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-4">
+      <div className="max-w-2xl mx-auto px-4 py-16 text-center font-['Roboto',Arial,sans-serif]">
+        <div className="w-16 h-16 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-3">
           <AlertCircle className="w-8 h-8" />
         </div>
-        <h2 className="text-xl font-bold text-gray-900 mb-2">Không có sản phẩm để thanh toán</h2>
-        <p className="text-xs text-gray-500 mb-6">Giỏ hàng của bạn đang trống, vui lòng chọn sản phẩm trước.</p>
+        <h2 className="text-base font-bold text-gray-800 mb-1">Không có sản phẩm để thanh toán</h2>
+        <p className="text-xs text-gray-500 mb-5">Giỏ hàng của bạn đang trống, vui lòng chọn sản phẩm trước.</p>
         <Link
           to="/"
-          className="px-5 py-2.5 rounded-xl bg-orange-600 text-white font-bold text-xs shadow-md"
+          className="px-5 py-2 rounded-[2px] bg-[#ee4d2d] text-white font-medium text-xs"
         >
-          Trở về trang mua sắm
+          Trở về mua sắm
         </Link>
       </div>
     );
@@ -96,8 +98,8 @@ export const CheckoutPage: React.FC = () => {
       showToast('Vui lòng nhập số điện thoại hợp lệ.', 'error');
       return;
     }
-    if (!recipientAddress.trim() || recipientAddress.trim().length < 10) {
-      showToast('Vui lòng nhập địa chỉ nhận hàng chi tiết (tối thiểu 10 ký tự).', 'error');
+    if (!recipientAddress.trim() || recipientAddress.trim().length < 8) {
+      showToast('Vui lòng nhập địa chỉ nhận hàng chi tiết.', 'error');
       return;
     }
 
@@ -126,182 +128,187 @@ export const CheckoutPage: React.FC = () => {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
-      <div className="flex items-center gap-3">
-        <Link to="/cart" className="p-2 rounded-xl hover:bg-gray-100 text-gray-600 transition-colors">
+    <div className="max-w-6xl mx-auto px-4 py-5 space-y-4 font-['Roboto',Arial,sans-serif]">
+      {/* Top Banner */}
+      <div className="bg-white rounded-[2px] border border-[#e8e8e8] p-4 shadow-sm flex items-center gap-3">
+        <Link to="/cart" className="p-1 hover:bg-gray-100 rounded text-gray-600">
           <ArrowLeft className="w-5 h-5" />
         </Link>
         <div>
-          <h1 className="text-xl sm:text-2xl font-black text-gray-900">Thanh Toán Đơn Hàng (COD)</h1>
-          <p className="text-xs text-gray-500">Kiểm tra thông tin giao nhận và xác nhận đặt hàng</p>
+          <h1 className="text-base sm:text-lg font-bold text-[#222222]">Thanh Toán Đơn Hàng</h1>
+          <p className="text-xs text-[#757575]">Vui lòng kiểm tra kỹ thông tin người nhận và đơn hàng COD</p>
         </div>
       </div>
 
-      <form onSubmit={handleSubmitOrder} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left: Shipping Address & Payment Form */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Shipping Address */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm space-y-4">
-            <h2 className="text-sm font-bold text-gray-900 flex items-center gap-2 border-b border-gray-100 pb-3">
-              <MapPin className="w-4 h-4 text-orange-600" />
-              Địa chỉ nhận hàng (Demo)
+      <form onSubmit={handleSubmitOrder} className="space-y-4">
+        {/* 1. Shopee Delivery Address Box with red-blue striped border style */}
+        <div className="bg-white rounded-[2px] border border-[#e8e8e8] shadow-sm overflow-hidden">
+          <div className="h-1 bg-gradient-to-r from-red-500 via-blue-500 to-red-500" />
+          <div className="p-5 space-y-4">
+            <h2 className="text-sm font-bold text-[#ee4d2d] flex items-center gap-2 uppercase tracking-wide">
+              <MapPin className="w-4 h-4" />
+              Địa Chỉ Nhận Hàng
             </h2>
 
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
                   Họ và tên người nhận <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
-                  <User className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
+                  <User className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
                   <input
                     type="text"
                     required
                     value={recipientName}
                     onChange={(e) => setRecipientName(e.target.value)}
                     placeholder="Nguyễn Văn An"
-                    className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs sm:text-sm font-medium outline-none focus:bg-white focus:border-orange-500"
+                    className="w-full pl-9 pr-3 py-2 text-xs border border-[#e8e8e8] rounded-[2px] outline-none focus:border-[#ee4d2d]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Số điện thoại liên hệ <span className="text-rose-500">*</span>
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Số điện thoại <span className="text-rose-500">*</span>
                 </label>
                 <div className="relative">
-                  <Phone className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
+                  <Phone className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
                   <input
                     type="tel"
                     required
                     value={recipientPhone}
                     onChange={(e) => setRecipientPhone(e.target.value)}
                     placeholder="0912345678"
-                    className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs sm:text-sm font-medium outline-none focus:bg-white focus:border-orange-500"
+                    className="w-full pl-9 pr-3 py-2 text-xs border border-[#e8e8e8] rounded-[2px] outline-none focus:border-[#ee4d2d]"
                   />
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Địa chỉ giao nhận chi tiết <span className="text-rose-500">*</span>
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Địa chỉ chi tiết <span className="text-rose-500">*</span>
                 </label>
-                <textarea
-                  rows={2}
+                <input
+                  type="text"
                   required
                   value={recipientAddress}
                   onChange={(e) => setRecipientAddress(e.target.value)}
-                  placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành phố..."
-                  className="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs sm:text-sm font-medium outline-none focus:bg-white focus:border-orange-500 resize-none"
+                  placeholder="Số nhà, tên đường, phường/xã, quận/huyện, tỉnh thành phố..."
+                  className="w-full px-3 py-2 text-xs border border-[#e8e8e8] rounded-[2px] outline-none focus:border-[#ee4d2d]"
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Ghi chú cho Shipper (Tùy chọn)
+              <div className="sm:col-span-2">
+                <label className="block text-xs font-medium text-gray-700 mb-1">
+                  Lời nhắn cho Người bán / Shipper
                 </label>
                 <input
                   type="text"
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
-                  placeholder="Ví dụ: Giao giờ hành chính, gọi trước khi đến 15 phút..."
-                  className="w-full px-3.5 py-2.5 bg-gray-50 border border-gray-200 rounded-xl text-xs sm:text-sm outline-none focus:bg-white focus:border-orange-500"
+                  placeholder="Lưu ý khi giao hàng (ví dụ: giao giờ hành chính, gọi trước khi đến...)"
+                  className="w-full px-3 py-2 text-xs border border-[#e8e8e8] rounded-[2px] outline-none focus:border-[#ee4d2d]"
                 />
-              </div>
-            </div>
-          </div>
-
-          {/* Payment Method Option */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm space-y-4">
-            <h2 className="text-sm font-bold text-gray-900 flex items-center gap-2 border-b border-gray-100 pb-3">
-              <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              Phương thức thanh toán
-            </h2>
-
-            <div className="p-4 rounded-xl border-2 border-orange-500 bg-orange-50/40 flex items-start gap-3">
-              <div className="w-5 h-5 rounded-full bg-orange-600 text-white flex items-center justify-center flex-shrink-0 mt-0.5">
-                <CheckCircle2 className="w-4 h-4" />
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="font-bold text-sm text-gray-900">
-                    Thanh toán khi nhận hàng (COD)
-                  </span>
-                  <span className="bg-emerald-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">
-                    Khuyên dùng
-                  </span>
-                </div>
-                <p className="text-xs text-gray-600 leading-relaxed">
-                  Bạn chỉ phải thanh toán số tiền <strong>{formatVND(totalAmount)}</strong> cho Shipper sau khi đã nhận và kiểm tra kiện hàng.
-                </p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Right: Products in checkout & Confirmation */}
-        <div className="space-y-4">
-          <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm space-y-4">
-            <h3 className="text-sm font-bold text-gray-900 border-b border-gray-100 pb-3">
-              Sản phẩm ({enrichedCart.length})
-            </h3>
+        {/* 2. Products List in Order */}
+        <div className="bg-white rounded-[2px] border border-[#e8e8e8] p-5 shadow-sm space-y-3">
+          <h2 className="text-sm font-bold text-[#222222] border-b border-[#e8e8e8] pb-2.5">
+            Sản Phẩm Đặt Mua ({enrichedCart.length})
+          </h2>
 
-            <div className="space-y-3 max-h-60 overflow-y-auto pr-1">
-              {enrichedCart.map((item) => (
-                <div key={item.productId} className="flex items-center gap-3 text-xs">
+          <div className="divide-y divide-[#e8e8e8]">
+            {enrichedCart.map((item) => (
+              <div key={item.productId} className="py-2.5 flex items-center justify-between gap-4 text-xs">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
                   <img
                     src={item.product.images?.[0] || FALLBACK_IMAGE}
                     alt={item.product.title}
-                    className="w-12 h-12 rounded-lg object-cover bg-gray-50 flex-shrink-0 border"
+                    className="w-12 h-12 rounded-[2px] object-cover bg-gray-50 border flex-shrink-0"
                   />
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-800 line-clamp-1">{item.product.title}</p>
-                    <div className="flex items-center justify-between text-gray-500 mt-1">
-                      <span>SL: x{item.quantity}</span>
-                      <span className="font-bold text-gray-900">{formatVND(item.product.price * item.quantity)}</span>
-                    </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-normal text-gray-900 line-clamp-1">{item.product.title}</p>
+                    <span className="text-gray-400 text-[11px]">Gian hàng: {item.product.sellerName}</span>
                   </div>
                 </div>
-              ))}
-            </div>
 
-            {/* Price Calculations */}
-            <div className="space-y-2 border-t border-gray-100 pt-4 text-xs text-gray-600">
-              <div className="flex justify-between">
-                <span>Tiền hàng:</span>
-                <span className="font-semibold text-gray-800">{formatVND(subtotal)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Phí vận chuyển:</span>
-                <span className="font-semibold text-gray-800">{formatVND(shippingFee)}</span>
-              </div>
-              {discount > 0 && (
-                <div className="flex justify-between text-emerald-600 font-semibold">
-                  <span>Voucher giảm giá ({appliedVoucherCode}):</span>
-                  <span>-{formatVND(discount)}</span>
+                <div className="text-right flex items-center gap-6 flex-shrink-0">
+                  <span className="text-gray-600">x{item.quantity}</span>
+                  <span className="font-bold text-[#ee4d2d] min-w-[80px]">
+                    {formatVND(item.product.price * item.quantity)}
+                  </span>
                 </div>
-              )}
-              <div className="border-t border-gray-100 pt-3 flex justify-between items-baseline">
-                <span className="text-sm font-bold text-gray-900">Tổng thanh toán COD:</span>
-                <span className="text-xl font-black text-orange-600">{formatVND(totalAmount)}</span>
               </div>
-            </div>
+            ))}
+          </div>
+        </div>
 
-            {/* Place Order CTA */}
+        {/* 3. Payment Method: COD */}
+        <div className="bg-white rounded-[2px] border border-[#e8e8e8] p-5 shadow-sm space-y-3">
+          <h2 className="text-sm font-bold text-[#222222] flex items-center gap-2 border-b border-[#e8e8e8] pb-2.5">
+            <ShieldCheck className="w-4 h-4 text-emerald-600" />
+            Phương Thức Thanh Toán
+          </h2>
+
+          <div className="p-3.5 rounded-[2px] border-2 border-[#ee4d2d] bg-orange-50/30 flex items-start gap-3">
+            <CheckCircle2 className="w-5 h-5 text-[#ee4d2d] flex-shrink-0 mt-0.5" />
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-xs text-gray-900">
+                  Thanh toán khi nhận hàng (COD)
+                </span>
+                <span className="text-[10px] bg-emerald-600 text-white font-bold px-1.5 py-0.2 rounded-[2px]">
+                  Bảo đảm
+                </span>
+              </div>
+              <p className="text-xs text-gray-600 mt-1 leading-relaxed">
+                Người mua thanh toán tiền mặt trực tiếp cho Shipper khi kiện hàng được giao đến đúng địa chỉ và kiểm tra an toàn.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* 4. Order Total Breakdown & CTA */}
+        <div className="bg-white rounded-[2px] border border-[#e8e8e8] p-5 shadow-sm space-y-3">
+          <div className="max-w-md ml-auto space-y-2 text-xs text-[#757575]">
+            <div className="flex justify-between">
+              <span>Tổng tiền hàng:</span>
+              <span className="font-medium text-[#222222]">{formatVND(subtotal)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Phí vận chuyển:</span>
+              <span className="font-medium text-[#222222]">{formatVND(shippingFee)}</span>
+            </div>
+            {discount > 0 && (
+              <div className="flex justify-between text-emerald-600 font-bold">
+                <span>Voucher giảm giá ({appliedVoucherCode}):</span>
+                <span>-{formatVND(discount)}</span>
+              </div>
+            )}
+            <div className="border-t border-[#e8e8e8] pt-2.5 flex justify-between items-baseline font-bold text-sm text-[#222222]">
+              <span>Tổng thanh toán COD:</span>
+              <span className="text-2xl font-bold text-[#ee4d2d]">{formatVND(totalAmount)}</span>
+            </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-between border-t border-[#e8e8e8] pt-4 gap-4">
+            <p className="text-[11px] text-gray-500">
+              Nhấn "Đặt Hàng Ngay" đồng nghĩa với việc bạn đồng ý tuân theo Điều khoản Shopee Demo.
+            </p>
+
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full py-3.5 px-4 rounded-xl font-bold text-sm text-white shadow-lg shadow-orange-600/30 flex items-center justify-center gap-2 transition-all ${
-                isSubmitting ? 'bg-orange-400 cursor-not-allowed' : 'bg-orange-600 hover:bg-orange-700'
+              className={`w-full sm:w-auto px-8 py-3 rounded-[2px] font-bold text-sm text-white uppercase shadow-sm transition-all ${
+                isSubmitting ? 'bg-orange-300 cursor-not-allowed' : 'bg-[#ee4d2d] hover:bg-[#d73211]'
               }`}
             >
-              <CheckCircle2 className="w-4 h-4" />
-              <span>{isSubmitting ? 'Đang khởi tạo đơn hàng...' : 'Đặt Hàng Ngay'}</span>
+              {isSubmitting ? 'Đang tạo đơn hàng...' : 'Đặt Hàng Ngay'}
             </button>
-
-            <p className="text-[10px] text-gray-400 text-center leading-tight">
-              Nhấn "Đặt Hàng Ngay" đồng nghĩa với việc bạn đồng ý với các điều khoản demo của MiniMall.
-            </p>
           </div>
         </div>
       </form>
