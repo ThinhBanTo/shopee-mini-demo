@@ -297,7 +297,7 @@ export const CheckoutPage: React.FC = () => {
 
           <div className="flex flex-col sm:flex-row items-center justify-between border-t border-[#e8e8e8] pt-4 gap-4">
             <p className="text-[11px] text-gray-500">
-              Nhấn "Đặt Hàng Ngay" đồng nghĩa với việc bạn đồng ý tuân theo Điều khoản Shopee Demo.
+              Nhấn "Đặt Hàng Ngay" đồng nghĩa với việc bạn đồng ý tuân theo Điều khoản MiniShoppe.
             </p>
 
             <button

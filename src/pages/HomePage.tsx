@@ -74,7 +74,7 @@ export const HomePage: React.FC = () => {
   // Banner slide auto rotation
   const banners = [
     {
-      title: 'Shopee Siêu Sale Lương Về - Miễn Phí Vận Chuyển 0Đ',
+      title: 'MiniShoppe Siêu Sale Lương Về - Miễn Phí Vận Chuyển 0Đ',
       subtitle: 'Voucher giảm 10% toàn sàn với mã DEMO10',
       badge: 'SIÊU SALE THÁNG 11',
       bg: 'bg-gradient-to-r from-[#ee4d2d] to-[#ff7337]',
@@ -277,7 +277,16 @@ export const HomePage: React.FC = () => {
                 }`}
               >
                 <div className="w-14 h-14 rounded-full overflow-hidden bg-gray-100 mb-1.5 flex items-center justify-center border border-gray-100">
-                  <img src={cat.image} alt={cat.name} className="w-full h-full object-cover" />
+                  <img
+                    src={cat.image}
+                    alt={cat.name}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src =
+                        'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=200&q=80';
+                    }}
+                  />
                 </div>
                 <span className="text-[11px] leading-tight text-gray-700 font-normal line-clamp-2">
                   {cat.name}

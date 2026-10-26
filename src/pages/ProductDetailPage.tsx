@@ -102,7 +102,7 @@ export const ProductDetailPage: React.FC = () => {
     <div className="max-w-6xl mx-auto px-4 py-4 space-y-4 font-['Roboto',Arial,sans-serif]">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-1.5 text-[13px] text-[#757575]">
-        <Link to="/" className="text-[#0055aa] hover:underline">Shopee</Link>
+        <Link to="/" className="text-[#0055aa] hover:underline">MiniShoppe</Link>
         <ChevronRight className="w-3.5 h-3.5 text-gray-400" />
         <Link to={`/?cat=${encodeURIComponent(product.category)}`} className="text-[#0055aa] hover:underline">
           {product.category}
@@ -184,7 +184,7 @@ export const ProductDetailPage: React.FC = () => {
               <div className="flex items-center gap-2 mb-2">
                 {product.isMall ? (
                   <span className="bg-[#d0011b] text-white font-bold text-[10px] uppercase px-1.5 py-0.5 rounded-[2px]">
-                    Shopee Mall
+                    MiniShoppe Mall
                   </span>
                 ) : (
                   <span className="bg-[#ee4d2d] text-white font-medium text-[10px] px-1.5 py-0.5 rounded-[2px]">
@@ -250,7 +250,7 @@ export const ProductDetailPage: React.FC = () => {
                   <span className="w-24 flex-shrink-0 text-[#757575]">Bảo Hiểm:</span>
                   <div className="flex items-center gap-1.5 text-gray-800">
                     <ShieldCheck className="w-4 h-4 text-[#ee4d2d]" />
-                    <span>Shopee Đảm Bảo - Trả hàng miễn phí 7 ngày</span>
+                    <span>MiniShoppe Đảm Bảo - Trả hàng miễn phí 7 ngày</span>
                   </div>
                 </div>
 

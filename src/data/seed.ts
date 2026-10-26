@@ -60,7 +60,7 @@ export interface CategoryInfo {
 export const CATEGORIES_WITH_IMAGE: CategoryInfo[] = [
   { id: 'cat-1', name: 'Thời trang nam', image: 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=200&q=80' },
   { id: 'cat-2', name: 'Thời trang nữ', image: 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=200&q=80' },
-  { id: 'cat-3', name: 'Điện thoại & Phụ kiện', image: 'https://images.unsplash.com/photo-1511707171634-5f897ff02560?auto=format&fit=crop&w=200&q=80' },
+  { id: 'cat-3', name: 'Điện thoại & Phụ kiện', image: 'https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?auto=format&fit=crop&w=200&q=80' },
   { id: 'cat-4', name: 'Thiết bị điện tử', image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=200&q=80' },
   { id: 'cat-5', name: 'Máy tính & Laptop', image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=200&q=80' },
   { id: 'cat-6', name: 'Đồng hồ & Phụ kiện', image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=200&q=80' },

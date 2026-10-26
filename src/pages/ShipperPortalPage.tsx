@@ -86,7 +86,7 @@ export const ShipperPortalPage: React.FC = () => {
               Cổng Điều Phối Vận Chuyển & Giao Hàng COD
             </h1>
             <p className="text-xs text-gray-500">
-              Tài xế đối tác: <strong>{currentUser?.name || 'Tài xế Shopee/MiniShoppe'}</strong> • Khu vực: TP. Hồ Chí Minh
+              Tài xế đối tác: <strong>{currentUser?.name || 'Tài xế MiniShoppe'}</strong> • Khu vực: TP. Hồ Chí Minh
             </p>
           </div>
         </div>

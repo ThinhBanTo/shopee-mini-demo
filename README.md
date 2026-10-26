@@ -1,43 +1,67 @@
-# MiniShoppe — Sàn Thương Mại Điện Tử Mô Phỏng (Interactive Prototype)
+# MiniShoppe
 
-> **Lưu ý:** Đây là đồ án mô phỏng phong cách sàn thương mại điện tử phục vụ học tập và báo cáo, không liên kết với Shopee. Ứng dụng hoạt động hoàn toàn ở client, không dùng backend thật hay cổng thanh toán thật.
+Website mô phỏng sàn thương mại điện tử phục vụ học tập.
 
-## 1. Giới thiệu
-MiniShoppe là ứng dụng thương mại điện tử mô phỏng đầy đủ chu trình mua bán hàng COD với 4 vai trò (Customer, Seller, Admin, Shipper), tích hợp hệ thống Mock Authentication (Đăng ký / Đăng nhập sử dụng Web Crypto PBKDF2) và giao diện phong cách marketplace Việt Nam hiện đại.
+## Giới thiệu
 
-## 2. Công nghệ sử dụng
-- **Core:** React 18, TypeScript, Vite
-- **Styling:** Tailwind CSS (Roboto font, tông màu `#EE4D2D`, Shopee marketplace UI)
-- **Routing:** React Router v6 (BrowserRouter + cấu hình SPA rewrite)
-- **State & Storage:** Zustand persist (`localStorage` schema v2, dữ liệu giỏ hàng và đơn mua phân lập theo từng tài khoản)
-- **Security Mock:** Web Crypto API (PBKDF2 SHA-256 derivation)
-- **Icons:** `lucide-react`
+MiniShoppe là đồ án xây dựng ứng dụng mô phỏng quy trình nghiệp vụ mua bán trực tuyến trên sàn thương mại điện tử. Ứng dụng tập trung vào tương tác giữa các bên liên quan trong chu trình xử lý đơn hàng theo hình thức thanh toán khi nhận hàng (COD). Toàn bộ luồng hoạt động chạy trực tiếp trên trình duyệt để phục vụ việc trình bày và đánh giá môn học.
 
-## 3. Cách chạy dự án tại Local
+## Chức năng chính
+
+- Khách hàng: Xem danh mục sản phẩm, tìm kiếm, quản lý giỏ hàng, áp dụng mã giảm giá, đặt hàng COD và theo dõi trạng thái đơn hàng.
+- Người bán: Đăng sản phẩm mới chờ phê duyệt, quản lý danh sách sản phẩm, xác nhận đơn hàng và chuẩn bị hàng giao cho bên vận chuyển.
+- Quản trị viên: Kiểm duyệt danh sách sản phẩm do người bán đăng ký (phê duyệt hoặc từ chối kèm lý do).
+- Đơn vị vận chuyển: Tiếp nhận đơn hàng cần giao, cập nhật tiến trình vận chuyển và xác nhận giao hàng thành công.
+
+## Công nghệ sử dụng
+
+- React + TypeScript
+- Vite
+- Tailwind CSS
+- React Router
+- Zustand
+- localStorage
+
+## Cài đặt và chạy
+
+Cài đặt các thư viện phụ thuộc:
+
 ```bash
-# 1. Cài đặt dependencies
 npm install
+```
 
-# 2. Khởi chạy môi trường phát triển
+Chạy môi trường phát triển:
+
+```bash
 npm run dev
+```
 
-# Mở trình duyệt tại: http://localhost:5173
+Kiểm tra bản dựng:
 
-# 3. Build kiểm tra production
+```bash
 npm run build
 ```
 
-## 4. Tài khoản Demo & 4 Vai trò (Mật khẩu: `demo12345`)
-- **Khách hàng (`customer`):** `khachhang@demo.vn` — Mua hàng COD, giỏ hàng riêng, theo dõi tiến trình đơn.
-- **Người bán (`seller`):** `nguoiban@demo.vn` — Đăng sản phẩm mới (chờ duyệt), xác nhận đơn hàng, đóng gói.
-- **Quản trị viên (`admin`):** `admin@demo.vn` — Kiểm duyệt phê duyệt / từ chối sản phẩm của Người bán.
-- **Shipper (`shipper`):** `shipper@demo.vn` — Tiếp nhận đơn vận chuyển và xác nhận giao hàng thành công.
-- *Có thể tự đăng ký tài khoản Khách hàng mới tại `/register` hoặc sử dụng Demo Mode dropdown trên Header.*
+## Tài khoản demo
 
-## 5. Giới hạn Mock Auth & Dữ liệu
-- Toàn bộ dữ liệu (tài khoản, mật khẩu băm PBKDF2, giỏ hàng, đơn hàng, sản phẩm) lưu trong `localStorage`.
-- Đổi trình duyệt hoặc bấm nút "Khôi phục dữ liệu mẫu ban đầu" sẽ khôi phục lại bộ 30 sản phẩm và 4 tài khoản mặc định.
+| Vai trò | Email | Mật khẩu |
+| --- | --- | --- |
+| Khách hàng | khachhang@demo.vn | demo12345 |
+| Người bán | nguoiban@demo.vn | demo12345 |
+| Quản trị viên | admin@demo.vn | demo12345 |
+| Đơn vị vận chuyển | shipper@demo.vn | demo12345 |
 
-## 6. Triển khai Vercel
-- Cấu hình SPA rewrite đã có trong file `vercel.json`.
-- Output directory khi deploy: `dist`.
+Người dùng có thể chuyển đổi nhanh giữa các vai trò bằng thanh công cụ chuyển vai trò (Demo Mode) trên thanh điều hướng hoặc tự đăng ký tài khoản khách hàng mới.
+
+## Demo
+
+Địa chỉ triển khai: https://shopee-mini-demo.vercel.app
+
+Quy trình trải nghiệm mẫu:
+Người bán đăng sản phẩm -> Quản trị viên duyệt -> Khách hàng đặt hàng -> Đơn vị vận chuyển giao hàng.
+
+## Lưu ý
+
+- Ứng dụng lưu trữ toàn bộ dữ liệu mẫu trong localStorage của trình duyệt.
+- Chức năng đăng nhập, thanh toán và xử lý đơn hàng chỉ phục vụ mô phỏng luồng nghiệp vụ.
+- Dữ liệu giữa các trình duyệt hoặc thiết bị khác nhau không tự động đồng bộ.

@@ -66,8 +66,8 @@ export const LoginPage: React.FC = () => {
               Đăng nhập
             </span>
           </div>
-          <Link to="/demo-guide" className="text-xs text-[#ee4d2d] hover:underline font-medium">
-            Bạn cần trợ giúp?
+          <Link to="/" className="text-xs text-[#ee4d2d] hover:underline font-medium">
+            Về trang chủ
           </Link>
         </div>
       </header>
@@ -81,10 +81,10 @@ export const LoginPage: React.FC = () => {
               <MiniShoppeIcon className="w-14 h-14" bagColor="#ffffff" monogramColor="#ee4d2d" />
             </div>
             <h1 className="text-3xl font-black tracking-tight">
-              Nền Tảng Mua Sắm & Điều Phối 4 Vai Trò
+              Nền Tảng Mua Sắm Trực Tuyến
             </h1>
             <p className="text-white/90 text-sm max-w-md leading-relaxed">
-              Trải nghiệm thực tế toàn trình từ Người bán đăng hàng, Quản trị viên duyệt, Khách hàng mua COD đến Shipper giao nhận.
+              Mua sắm hàng ngàn sản phẩm giá tốt, miễn phí vận chuyển và nhận hàng thanh toán COD tiện lợi.
             </p>
             <div className="pt-4 flex items-center gap-4 text-xs font-medium text-amber-200">
               <span>✓ Flash Sale giá tốt</span>

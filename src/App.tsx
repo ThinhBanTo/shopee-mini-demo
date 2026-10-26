@@ -5,7 +5,6 @@ import { ToastProvider } from './components/Toast';
 import { MainLayout } from './layouts/MainLayout';
 import { HomePage } from './pages/HomePage';
 import { ProductDetailPage } from './pages/ProductDetailPage';
-import { DemoGuidePage } from './pages/DemoGuidePage';
 import { NotFoundPage } from './pages/NotFoundPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
@@ -49,8 +48,7 @@ const App: React.FC = () => {
             {/* Shipper routes */}
             <Route path="shipper" element={<ShipperPortalPage />} />
 
-            {/* Demo guide & 404 */}
-            <Route path="demo-guide" element={<DemoGuidePage />} />
+            {/* 404 */}
             <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>

@@ -7,12 +7,9 @@ import {
   ShieldCheck,
   Truck,
   RotateCcw,
-  BookOpen,
   ChevronDown,
   LogOut,
   Package,
-  Bell,
-  HelpCircle,
 } from 'lucide-react';
 import { BrandLogo } from './BrandLogo';
 import { useAppStore } from '../store/useAppStore';
@@ -84,28 +81,10 @@ export const Navbar: React.FC = () => {
               <Store className="w-3.5 h-3.5" />
               <span>Kênh Người Bán</span>
             </Link>
-            <span className="text-white/30">|</span>
-            <Link to="/demo-guide" className="hover:text-white/80 transition-colors flex items-center gap-1">
-              <BookOpen className="w-3.5 h-3.5" />
-              <span>Kịch bản Demo 6 bước</span>
-            </Link>
-            <span className="text-white/30 hidden sm:inline">|</span>
-            <span className="hidden sm:inline text-white/80">Kết nối: Facebook, Instagram</span>
           </div>
 
           {/* Right Top Links */}
           <div className="flex items-center gap-4">
-            <div className="hidden md:flex items-center gap-3 text-white/90">
-              <div className="flex items-center gap-1 hover:text-white cursor-pointer">
-                <Bell className="w-3.5 h-3.5" />
-                <span>Thông Báo</span>
-              </div>
-              <div className="flex items-center gap-1 hover:text-white cursor-pointer">
-                <HelpCircle className="w-3.5 h-3.5" />
-                <span>Hỗ Trợ</span>
-              </div>
-            </div>
-
             {/* Discreet Demo Switcher Dropdown */}
             <div className="relative">
               <button
@@ -148,17 +127,6 @@ export const Navbar: React.FC = () => {
                       </div>
                     </button>
                   ))}
-
-                  <div className="border-t border-gray-100 mt-1 pt-1">
-                    <Link
-                      to="/demo-guide"
-                      onClick={() => setIsDemoMenuOpen(false)}
-                      className="flex items-center gap-2 px-3 py-2 text-[#ee4d2d] hover:bg-orange-50 font-medium transition-colors"
-                    >
-                      <BookOpen className="w-3.5 h-3.5" />
-                      <span>Kịch bản Demo 6 bước</span>
-                    </Link>
-                  </div>
                 </div>
               )}
             </div>
@@ -274,7 +242,7 @@ export const Navbar: React.FC = () => {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Shopee bao ship 0Đ - Đăng ký nhận ngay voucher 50k..."
+                  placeholder="MiniShoppe bao ship 0Đ - Đăng ký nhận ngay voucher 50k..."
                   className="w-full px-3 text-[14px] text-gray-800 placeholder-gray-400 outline-none"
                 />
                 <button

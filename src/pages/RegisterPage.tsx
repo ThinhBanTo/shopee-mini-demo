@@ -89,8 +89,8 @@ export const RegisterPage: React.FC = () => {
               Đăng ký
             </span>
           </div>
-          <Link to="/demo-guide" className="text-xs text-[#ee4d2d] hover:underline font-medium">
-            Bạn cần trợ giúp?
+          <Link to="/" className="text-xs text-[#ee4d2d] hover:underline font-medium">
+            Về trang chủ
           </Link>
         </div>
       </header>
@@ -110,7 +110,7 @@ export const RegisterPage: React.FC = () => {
               Nhận ngay voucher ưu đãi DEMO10 và mã FREESHIP, quản lý giỏ hàng và theo dõi đơn mua thuận tiện.
             </p>
             <div className="pt-4 flex items-center gap-4 text-xs font-medium text-amber-200">
-              <span>✓ Bảo mật mật khẩu PBKDF2</span>
+              <span>✓ Mua sắm tiện lợi</span>
               <span>•</span>
               <span>✓ Giỏ hàng riêng biệt</span>
             </div>
